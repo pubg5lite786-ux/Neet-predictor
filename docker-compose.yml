@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: neet-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - neet-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: neet-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: neet_user
+      POSTGRES_PASSWORD: neet_password
+      POSTGRES_DB: neet_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - neet-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: neet-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - neet-network
+
+  # Backend API
+  backend:
+    build: ./backend
+    container_name: neet-backend
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/neet_db?authSource=admin
+      DATABASE_URL: postgresql://neet_user:neet_password@postgres:5432/neet_db
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - mongodb
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - neet-network
+
+  # Frontend App
+  frontend:
+    build: ./frontend
+    container_name: neet-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:5000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+    networks:
+      - neet-network
+
+volumes:
+  mongodb_data:
+  postgres_data:
+
+networks:
+  neet-network:
+    driver: bridge

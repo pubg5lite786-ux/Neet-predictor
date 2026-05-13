@@ -1,0 +1,25 @@
+{
+  "name": "neet-predictor",
+  "version": "1.0.0",
+  "description": "Complete NEET Counseling & Preparation Hub",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --workspace=frontend & npm run dev --workspace=backend",
+    "build": "npm run build --workspace=frontend && npm run build --workspace=backend",
+    "start": "npm start --workspace=frontend & npm start --workspace=backend",
+    "test": "npm test --workspace=frontend && npm test --workspace=backend",
+    "lint": "npm run lint --workspace=frontend && npm run lint --workspace=backend",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "devDependencies": {
+    "prettier": "^3.0.0",
+    "eslint": "^8.40.0",
+    "husky": "^8.0.0"
+  }
+}
